@@ -1,8 +1,12 @@
-Shader "Custom/BaseHLSL"
+// Textureをグレースケール化させるShader
+// _Ratioが1の場合グレースケール、0の場合は元のTexture表示
+
+Shader "Custom/Grayscale"
 {
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _Ratio("Ratio", Range(0, 1)) = 1
     }
     SubShader
     {
@@ -48,6 +52,7 @@ Shader "Custom/BaseHLSL"
             };
 
             sampler2D _MainTex;
+            float _Ratio;
 
             CBUFFER_START(UnityPerMaterial)
             float4 _MainTex_ST;
@@ -65,7 +70,9 @@ Shader "Custom/BaseHLSL"
 
             half4 frag (Varyings i) : SV_Target
             {
-                return tex2D(_MainTex, i.uv);
+                half4 color = tex2D(_MainTex, i.uv);
+                half luminosity = dot(color, half3(0.299, 0.587, 0.114));
+                return lerp(color, half4(luminosity, luminosity, luminosity, color.a), _Ratio) * i.color;
             }
             ENDHLSL
         }
