@@ -1,7 +1,8 @@
 // Textureをグレースケール化させるShader
 // _Ratioが1の場合グレースケール、0の場合は元のTexture表示
+// ※UIに設定する場合はTransparent扱いする必要があるらしい、OpaqueだとSceneViewで表示されない
 
-Shader "Custom/Grayscale"
+Shader "Custom/GrayscaleTransparent"
 {
     Properties
     {
@@ -11,8 +12,8 @@ Shader "Custom/Grayscale"
     SubShader
     {
         Tags {
-            "RenderType"="Opaque"
-            "Queue"="Geometry"
+            "RenderType"="Transparent"
+            "Queue"="Transparent"
             "IgnoreProjector"="True"
             "RenderPipeline"="UniversalPipeline"
         }
