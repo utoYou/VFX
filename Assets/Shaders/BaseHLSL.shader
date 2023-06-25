@@ -8,6 +8,7 @@ Shader "Custom/BaseHLSL"
     {
         Tags {
             "RenderType"="Opaque"
+            "Queue"="Geometry"
             "IgnoreProjector"="True"
             "RenderPipeline"="UniversalPipeline"
         }
