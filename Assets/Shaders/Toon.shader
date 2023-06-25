@@ -37,6 +37,8 @@ Shader "Custom/Toon"
             // make fog work
             #pragma multi_compile_fog
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+            #define _MAIN_LIGHT_SHADOWS_CASCADE
+            #define _SHADOWS_SOFT
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
@@ -111,6 +113,6 @@ Shader "Custom/Toon"
             ENDHLSL
         }
 
-        UsePass "Legacy Shaders/VertexLit/SHADOWCASTER"
+        UsePass "Universal Render Pipeline/Lit/ShadowCaster"
     }
 }
