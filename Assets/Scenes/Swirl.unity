@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 950808688}
   - component: {fileID: 950808687}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Swirl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
