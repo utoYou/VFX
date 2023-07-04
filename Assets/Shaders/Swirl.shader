@@ -1,5 +1,5 @@
-// 実装的にアルファを含む画像では見た目を損なうかも
-Shader "Custom/Ripple"
+// 渦巻きShader
+Shader "Custom/Swirl"
 {
     Properties
     {
