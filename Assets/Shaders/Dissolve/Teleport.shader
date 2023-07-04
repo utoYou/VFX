@@ -1,15 +1,14 @@
-Shader "Custom/Dissolve"
+Shader "Custom/Teleport"
 {
     Properties
     {
-        [HDR]
-        _BaseColor ("Color", Color) = (1, 1, 1)
-        [HDR]
-        _EdgeColor ("Dissolve Color", Color) = (0, 0, 0)
         _MainTex ("Texture", 2D) = "white" {}
         _DissolveTex ("Dissolve Texture", 2D) = "white" {}
-        _AlphaClipThreshold ("Alpha Clip Threshold", Range(0, 1)) = 1
-        _EdgeWidth ("Dissolve Margin Width", Range(0, 1)) = 0.01
+        _Progress ("Progress", Range(0, 1)) = 0
+        _NoiseDensity ("Noise Density", Range(0, 60)) = 0
+        _BeamSize ("Beam Size", Range(0.01, 0.15)) = 0.01
+        [HDR]
+        _Color ("Color", Color) = (1, 1, 1, 1)
     }
     SubShader
     {
@@ -51,17 +50,37 @@ Shader "Custom/Dissolve"
                 float4 positionHCS : SV_POSITION;
             };
 
-            half4 _BaseColor;
-            half4 _EdgeColor;
             sampler2D _MainTex;
             sampler2D _DissolveTex;
-            half _AlphaClipThreshold;
-            half _EdgeWidth;
+            half _Progress;
+            half _NoiseDensity;
+            half _BeamSize;
+            half4 _Color;
 
             CBUFFER_START(UnityPerMaterial)
             float4 _MainTex_ST;
             float4 _DissolveTex_ST;
             CBUFFER_END
+
+            float2 random(float2 uv)
+            {
+                uv = float2(dot(uv, float2(127.1, 311.7)),
+                            dot(uv, float2(269.5, 183.3)));
+                return float2(-1.0 + 2.0 * frac(sin(uv) * 43758.5453123));
+            }
+
+            float noise(float2 uv)
+            {
+                float2 uv_index = floor(uv);
+                float2 uv_frac = frac(uv);
+
+                float2 blur = smoothstep(0.0, 1.0, uv_frac);
+
+                return lerp(lerp(dot(random(uv_index + float2(0, 0)), uv_frac - float2(0, 0)),
+                                dot(random(uv_index + float2(1, 0)), uv_frac - float2(1, 0)), blur.x),
+                            lerp(dot(random(uv_index + float2(0, 1)), uv_frac - float2(0, 1)),
+                                dot(random(uv_index + float2(1, 1)), uv_frac - float2(1, 1)), blur.x), blur.y) * 0.5 + 0.5;
+            }
 
             Varyings vert (Attributes v)
             {
@@ -73,20 +92,16 @@ Shader "Custom/Dissolve"
 
             half4 frag (Varyings i) : SV_Target
             {
-                half4 edgeColor = half4(1, 1, 1, 1);
+                half4 mainColor = tex2D(_MainTex, i.uv);
+                float noiseValue = noise(i.uv * _NoiseDensity) * (1 -i.uv.y);
 
-                half4 dissolve = tex2D(_DissolveTex, i.uv);
-                float alpha = (dissolve.r * 0.2 + dissolve.g * 0.7 + dissolve.b * 0.1) * 0.999;
-                
-                if (alpha < _AlphaClipThreshold + _EdgeWidth && _AlphaClipThreshold > 0)
-                {
-                    edgeColor = _EdgeColor;
-                }
-                if (alpha < _AlphaClipThreshold)
-                {
-                    discard;
-                }
-                return tex2D(_MainTex, i.uv) * _BaseColor * edgeColor;
+                float d1 = step(_Progress, noiseValue);
+                float d2 = step(_Progress - _BeamSize, noiseValue);
+
+                half3 beam = (d2 - d1) * _Color.rgb;
+                mainColor.rgb += beam;
+                mainColor.a *= d2;
+                return mainColor;
             }
             ENDHLSL
         }
