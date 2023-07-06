@@ -85,10 +85,10 @@ Shader "Custom/Swirl"
 
                 trs += float2(1, 1);
                 trs /= 2.0;
-                // if (trs.x > 1 || trs.x < 0 || trs.y > 1 || trs.y < 0)
-                // {
-                //     discard;
-                // }
+                if (trs.x > 1 || trs.x < 0 || trs.y > 1 || trs.y < 0)
+                {
+                    discard;
+                }
                 return tex2D(_MainTex, trs);
             }
             ENDHLSL
