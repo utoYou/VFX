@@ -78,8 +78,8 @@ Shader "Custom/TestClamp"
             half4 frag (Varyings i) : SV_Target
             {
                 float darkness = clamp(_Xvalue, _Avalue, _Bvalue);
-                half4 col = tex2D(_MainTex, i.uv) * darkness;
-                return col;
+                half4 col = tex2D(_MainTex, i.uv);
+                return half4(col.rgb * darkness, col.a);
             }
             ENDHLSL
         }
