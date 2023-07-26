@@ -47,7 +47,9 @@ Shader "Custom/TestTime"
                 half4 color : COLOR;
             };
 
-            sampler2D _MainTex;
+            TEXTURE2D(_MainTex);
+            // TextureのWrapModeをShader側から指定する 今回はRepeat
+            SamplerState sampler_point_repeat;
 
             CBUFFER_START(UnityPerMaterial)
             float4 _MainTex_ST;
@@ -55,9 +57,6 @@ Shader "Custom/TestTime"
 
             Varyings vert (Attributes v)
             {
-                v.uv.x += _SinTime.w;
-                v.uv.y += _CosTime.w;
-
                 Varyings o;
                 o.positionHCS = TransformObjectToHClip(v.positionOS.xyz);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
@@ -68,7 +67,9 @@ Shader "Custom/TestTime"
 
             half4 frag (Varyings i) : SV_Target
             {
-                half4 col = tex2D(_MainTex, i.uv);
+                i.uv.x += _SinTime.w;
+                i.uv.y += _CosTime.w;
+                half4 col = _MainTex.Sample(sampler_point_repeat, i.uv);
                 return col;
             }
             ENDHLSL
