@@ -1,16 +1,19 @@
-Shader "Custom/TestCeil"
+Shader "Custom/FadeRadial"
 {
     Properties
     {
+        [NoScaleOffset]
         _MainTex ("Texture", 2D) = "white" {}
-        _Zoom ("Zoom", Range(0.5, 1)) = 0
+        _Threthold ("Threthold", Range(0, 1)) = 0
+        _CircleCenterX ("Circle Center X", Range(0, 1)) = 0.5
+        _CircleCenterY ("Circle Center Y", Range(0, 1)) = 0.5
     }
     SubShader
     {
         Tags {
             "RenderType"="Transparent"
             "Queue"="Transparent"
-            "LightMode"="ForwardBase"
+            "IgnoreProjector"="True"
             "RenderPipeline"="UniversalPipeline"
         }
         LOD 100
@@ -20,6 +23,7 @@ Shader "Custom/TestCeil"
             Name "ForwardLit"
             Tags { "LightMode"="UniversalForward" }
 
+            Cull Off
             Lighting Off
             ZWrite Off
             Blend SrcAlpha OneMinusSrcAlpha
@@ -45,7 +49,10 @@ Shader "Custom/TestCeil"
             };
 
             sampler2D _MainTex;
-            half _Zoom;
+            half4 _MainTex_TexelSize;
+            half _Threthold;
+            half _CircleCenterX;
+            half _CircleCenterY;
 
             CBUFFER_START(UnityPerMaterial)
             float4 _MainTex_ST;
@@ -61,13 +68,18 @@ Shader "Custom/TestCeil"
 
             half4 frag (Varyings i) : SV_Target
             {
-                float u = ceil(i.uv.x) * 0.5;
-                float v = ceil(i.uv.y) * 0.5;
+                // Textureサイズによって円の比率が歪むので正円になるようにする
+                half2 resolution = half2((_MainTex_TexelSize.x / _MainTex_TexelSize.y).xx);
+                _MainTex_ST.xy = resolution;
+                _MainTex_ST.zw = resolution * -0.5;
 
-                float uLerp = lerp(u, i.uv.x, _Zoom);
-                float vLerp = lerp(v, i.uv.y, _Zoom);
-                half4 col = tex2D(_MainTex, float2(uLerp, vLerp));
-                return col;
+                half2 center = half2(_CircleCenterX, _CircleCenterY);
+                half d = distance(center, i.uv);
+                // stepの引数の順番を変えると印象が変わる
+                half isMasked = step(_Threthold, d);
+
+                half4 col = tex2D(_MainTex, i.uv);
+                return isMasked ? half4(0, 0, 0, 1) : col;
             }
             ENDHLSL
         }
