@@ -2,7 +2,7 @@ Shader "Custom/FadeRadial"
 {
     Properties
     {
-        // [NoScaleOffset]
+        [NoScaleOffset]
         _MainTex ("Texture", 2D) = "white" {}
         _Threthold ("Threthold", Range(0, 1)) = 0
         _CircleCenterX ("Circle Center X", Range(0, 1)) = 0.5
