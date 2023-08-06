@@ -75,11 +75,7 @@ Shader "Custom/FadeRadialTextureMask"
 
             half4 frag (Varyings i) : SV_Target
             {
-                // Textureサイズによって円の比率が歪むので正円になるようにする
                 half2 resolution = half2((_MainTex_TexelSize.x / _MainTex_TexelSize.y).xx);
-                _MainTex_ST.xy = resolution;
-                _MainTex_ST.zw = resolution * -0.5;
-
                 half2 center = half2(_CenterX, _CenterY);
                 half2 maskUV = i.uv2 - center;
                 maskUV = maskUV * pow(_Scale, 3);
