@@ -2,7 +2,7 @@ Shader "Custom/FadeRadial"
 {
     Properties
     {
-        [NoScaleOffset]
+        // [NoScaleOffset]
         _MainTex ("Texture", 2D) = "white" {}
         _Threthold ("Threthold", Range(0, 1)) = 0
         _CircleCenterX ("Circle Center X", Range(0, 1)) = 0.5
@@ -49,7 +49,7 @@ Shader "Custom/FadeRadial"
             };
 
             sampler2D _MainTex;
-            half4 _MainTex_TexelSize;
+            float4 _MainTex_TexelSize;
             half _Threthold;
             half _CircleCenterX;
             half _CircleCenterY;
@@ -69,15 +69,15 @@ Shader "Custom/FadeRadial"
             half4 frag (Varyings i) : SV_Target
             {
                 // Textureサイズによって円の比率が歪むので正円になるようにする
-                half2 resolution = half2((_MainTex_TexelSize.x / _MainTex_TexelSize.y).xx);
-                _MainTex_ST.xy = resolution;
-                _MainTex_ST.zw = resolution * -0.5;
-
+                half resolution = _MainTex_TexelSize.z / _MainTex_TexelSize.w;
                 half2 center = half2(_CircleCenterX, _CircleCenterY);
-                half d = distance(center, i.uv);
+                half2 targetUV = i.uv;
+                targetUV -= center;
+                targetUV.x *= resolution;
+                targetUV += center;
+                half d = distance(center, targetUV);
                 // stepの引数の順番を変えると印象が変わる
                 half isMasked = step(_Threthold, d);
-
                 half4 col = tex2D(_MainTex, i.uv);
                 return isMasked ? half4(0, 0, 0, 1) : col;
             }
