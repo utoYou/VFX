@@ -32,6 +32,6 @@ Material:
     m_Floats:
     - _CenterX: 0.5
     - _CenterY: 0.5
-    - _Scale: 1.4
+    - _Scale: 0.51
     m_Colors: []
   m_BuildTextureStacks: []
