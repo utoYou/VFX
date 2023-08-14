@@ -9,8 +9,8 @@ Shader "Custom/UVScroll"
     SubShader
     {
         Tags {
-            "RenderType"="Opaque"
-            "Queue"="Geometry"
+            "RenderType"="Transparent"
+            "Queue"="Transparent"
             "IgnoreProjector"="True"
             "RenderPipeline"="UniversalPipeline"
         }
@@ -21,16 +21,13 @@ Shader "Custom/UVScroll"
             Name "ForwardLit"
             Tags { "LightMode"="UniversalForward" }
 
-            // Cull Off
             Lighting Off
             // ZWrite Off
-            // Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha
 
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            // make fog work
-            #pragma multi_compile_fog
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
