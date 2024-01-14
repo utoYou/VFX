@@ -78,7 +78,7 @@ Shader "Custom/Toon"
                 o.positionHCS = TransformObjectToHClip(v.positionOS.xyz);
                 VertexPositionInputs vertexInput = GetVertexPositionInputs(v.positionOS.xyz);
                 o.shadowCoord = GetShadowCoord(vertexInput);
-                o.viewDirWS = GetWorldSpaceViewDir(v.positionOS.xyz);
+                o.viewDirWS = GetWorldSpaceViewDir(v.positionOS.xyz); // ここOSじゃなくてWSかも
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 o.normal = TransformObjectToWorldNormal(v.normal);
                 return o;

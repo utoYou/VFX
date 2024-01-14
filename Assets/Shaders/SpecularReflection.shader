@@ -77,7 +77,7 @@ Shader "Custom/SpecularReflection"
             {
                 Varyings o;
                 o.positionHCS = TransformObjectToHClip(v.positionOS.xyz);
-                o.viewDirWS = GetWorldSpaceViewDir(v.positionOS.xyz);
+                o.viewDirWS = GetWorldSpaceViewDir(v.positionOS.xyz);   // ここOSじゃなくてWSかも
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 o.fogFactor = ComputeFogFactor(o.positionHCS.z);
                 o.color = v.color;
